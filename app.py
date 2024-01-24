@@ -8,13 +8,22 @@ import io
 from PIL import Image
 import pdf2image
 import google.generativeai as genai
-from prompts import input_prompt1, input_prompt2, input_prompt3, input_prompt4, input_prompt5, input_prompt6, input_prompt7,input_prompt8
+from prompts import (
+    input_prompt1,
+    input_prompt2,
+    input_prompt3,
+    input_prompt4,
+    input_prompt5,
+    input_prompt6,
+    input_prompt7,
+    input_prompt8,
+)
 
 genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 
 
 def extract_field_from_description(description):
-    return "Extracted Field"
+    return input_role
 
 
 def construct_prompt(template, field):
@@ -69,6 +78,7 @@ input_name = st.text_input("Enter your name: ", key="name", placeholder="John Do
 input_role = st.text_input(
     "Role you are applying for: ", key="role", placeholder="Software Engineer"
 )
+
 input_text = st.text_area(
     "Job Description: ", key="input", placeholder="Paste the job description here..."
 )
@@ -97,9 +107,10 @@ if uploaded_file is not None:
     # Prompts here
 
 field = extract_field_from_description(input_text)
-print(field)
+
 
 dynamic_prompt1 = construct_prompt(input_prompt1, field)
+print(dynamic_prompt1)
 dynamic_prompt2 = construct_prompt(input_prompt2, field)
 dynamic_prompt3 = construct_prompt(input_prompt3, field)
 dynamic_prompt4 = construct_prompt(input_prompt4, field)
@@ -119,6 +130,9 @@ if input_text and uploaded_file:
     if is_pdf_valid:
         # Process for each tab if PDF is valid
         field = extract_field_from_description(input_text)
+
+        st.subheader("Name : " + input_name)
+        st.subheader("Role : " + input_role)
 
         tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs(
             [
