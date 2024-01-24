@@ -110,7 +110,6 @@ field = extract_field_from_description(input_text)
 
 
 dynamic_prompt1 = construct_prompt(input_prompt1, field)
-print(dynamic_prompt1)
 dynamic_prompt2 = construct_prompt(input_prompt2, field)
 dynamic_prompt3 = construct_prompt(input_prompt3, field)
 dynamic_prompt4 = construct_prompt(input_prompt4, field)
