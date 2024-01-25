@@ -6,8 +6,9 @@ import streamlit as st
 import os
 import io
 import textwrap
+import tempfile
 from PIL import Image
-import pdf2image
+import fitz
 import google.generativeai as genai
 from prompts import (
     input_prompt1,
@@ -45,73 +46,29 @@ def get_gemini_response(input, pdf_content, prompt):
 
 def input_pdf_setup(uploaded_file):
     if uploaded_file is not None:
-        # Reset the file pointer to the start of the file
-        uploaded_file.seek(0)
-
-        # Read the file content
-        file_content = uploaded_file.read()
-
-        # Check if the file content is not empty
+        file_content = uploaded_file.getvalue()
         if file_content:
             try:
-                images = pdf2image.convert_from_bytes(file_content)
-                first_page = images[0]
-
-                # Convert to bytes
-                img_byte_arr = io.BytesIO()
-                first_page.save(img_byte_arr, format="JPEG")
-                img_byte_arr = img_byte_arr.getvalue()
-
-                pdf_parts = [
-                    {
-                        "mime_type": "image/jpeg",
-                        "data": base64.b64encode(img_byte_arr).decode(),
-                    }
-                ]
-                return pdf_parts
-            except pdf2image.exceptions.PDFPageCountError as e:
-                raise e
-        else:
-            raise ValueError("Uploaded file is empty or invalid.")
-    else:
-        raise FileNotFoundError("No file uploaded")
-
-    # def input_pdf_setup(uploaded_file):
-    if uploaded_file is not None:
-        # Reset the file pointer to the start of the file
-        uploaded_file.seek(0)
-
-        # Read the file content
-        file_content = uploaded_file.read()
-
-        # Check if the file content is not empty
-        if file_content:
-            try:
-                # Convert PDF content to images
-                images = pdf2image.convert_from_bytes(file_content)
-                if images:
-                    first_page = images[0]
-
-                    # Convert the first page to bytes
-                    img_byte_arr = io.BytesIO()
-                    first_page.save(img_byte_arr, format="JPEG")
-                    img_byte_arr = img_byte_arr.getvalue()
+                doc = fitz.open(stream=file_content, filetype="pdf")
+                if len(doc) > 0:
+                    page = doc.load_page(0)  # first page
+                    pix = page.get_pixmap()
+                    img_byte_arr = pix.tobytes("png")  # get bytes directly
 
                     pdf_parts = [
                         {
-                            "mime_type": "image/jpeg",
+                            "mime_type": "image/png",
                             "data": base64.b64encode(img_byte_arr).decode(),
                         }
                     ]
                     return pdf_parts
                 else:
-                    raise ValueError("No images found in the PDF.")
-            except pdf2image.exceptions.PDFPageCountError as e:
-                st.error("Error processing PDF: Unable to get page count.")
-                raise e
+                    raise ValueError("PDF does not contain any pages.")
             except Exception as e:
                 st.error(f"Error processing PDF: {e}")
                 raise e
+            finally:
+                doc.close()
         else:
             st.error("Uploaded file is empty or invalid.")
             raise ValueError("Uploaded file is empty or invalid.")
@@ -125,8 +82,6 @@ def input_pdf_setup(uploaded_file):
 st.set_page_config(
     page_title="ATS Resume Expert",
     page_icon="🔥",
-    layout="wide",
-    initial_sidebar_state="expanded",
 )
 st.header("ATS Friendly Resume and Analysis")
 input_name = st.text_input("Enter your name: ", key="name", placeholder="John Doe")
@@ -176,9 +131,11 @@ dynamic_prompt8 = construct_prompt(input_prompt8, field)
 if input_text and uploaded_file:
     try:
         pdf_content = input_pdf_setup(uploaded_file)
+        print(pdf_content)
         is_pdf_valid = True
-    except pdf2image.exceptions.PDFPageCountError:
-        st.error("Error processing the PDF file. Please upload a valid PDF.")
+
+    except Exception as e:
+        st.error(f"Error processing the PDF file: {e}")
         is_pdf_valid = False
 
     if is_pdf_valid:
