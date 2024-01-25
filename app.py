@@ -30,9 +30,10 @@ def extract_field_from_description(description):
 def construct_prompt(template, field):
     return template.replace("[User-Specified Field]", field)
 
+
 def to_markdown(text):
-   text = text.replace('•', '  *')
-   return textwrap.indent(text, '> ', predicate=lambda _: True)
+    text = text.replace("•", "  *")
+    return textwrap.indent(text, "> ", predicate=lambda _: True)
 
 
 def get_gemini_response(input, pdf_content, prompt):
@@ -40,6 +41,40 @@ def get_gemini_response(input, pdf_content, prompt):
     response = model.generate_content([input, pdf_content[0], prompt])
     #   return response.text
     return to_markdown(response.text)
+
+
+# def input_pdf_setup(uploaded_file):
+#     if uploaded_file is not None:
+#         # Reset the file pointer to the start of the file
+#         uploaded_file.seek(0)
+
+#         # Read the file content
+#         file_content = uploaded_file.read()
+
+#         # Check if the file content is not empty
+#         if file_content:
+#             try:
+#                 images = pdf2image.convert_from_bytes(file_content)
+#                 first_page = images[0]
+
+#                 # Convert to bytes
+#                 img_byte_arr = io.BytesIO()
+#                 first_page.save(img_byte_arr, format="JPEG")
+#                 img_byte_arr = img_byte_arr.getvalue()
+
+#                 pdf_parts = [
+#                     {
+#                         "mime_type": "image/jpeg",
+#                         "data": base64.b64encode(img_byte_arr).decode(),
+#                     }
+#                 ]
+#                 return pdf_parts
+#             except pdf2image.exceptions.PDFPageCountError as e:
+#                 raise e
+#         else:
+#             raise ValueError("Uploaded file is empty or invalid.")
+#     else:
+#         raise FileNotFoundError("No file uploaded")
 
 
 def input_pdf_setup(uploaded_file):
@@ -53,26 +88,36 @@ def input_pdf_setup(uploaded_file):
         # Check if the file content is not empty
         if file_content:
             try:
+                # Convert PDF content to images
                 images = pdf2image.convert_from_bytes(file_content)
-                first_page = images[0]
+                if images:
+                    first_page = images[0]
 
-                # Convert to bytes
-                img_byte_arr = io.BytesIO()
-                first_page.save(img_byte_arr, format="JPEG")
-                img_byte_arr = img_byte_arr.getvalue()
+                    # Convert the first page to bytes
+                    img_byte_arr = io.BytesIO()
+                    first_page.save(img_byte_arr, format="JPEG")
+                    img_byte_arr = img_byte_arr.getvalue()
 
-                pdf_parts = [
-                    {
-                        "mime_type": "image/jpeg",
-                        "data": base64.b64encode(img_byte_arr).decode(),
-                    }
-                ]
-                return pdf_parts
+                    pdf_parts = [
+                        {
+                            "mime_type": "image/jpeg",
+                            "data": base64.b64encode(img_byte_arr).decode(),
+                        }
+                    ]
+                    return pdf_parts
+                else:
+                    raise ValueError("No images found in the PDF.")
             except pdf2image.exceptions.PDFPageCountError as e:
+                st.error("Error processing PDF: Unable to get page count.")
+                raise e
+            except Exception as e:
+                st.error(f"Error processing PDF: {e}")
                 raise e
         else:
+            st.error("Uploaded file is empty or invalid.")
             raise ValueError("Uploaded file is empty or invalid.")
     else:
+        st.error("No file uploaded.")
         raise FileNotFoundError("No file uploaded")
 
 
