@@ -76,8 +76,7 @@ def input_pdf_setup(uploaded_file):
     else:
         raise FileNotFoundError("No file uploaded")
 
-
-# def input_pdf_setup(uploaded_file):
+    # def input_pdf_setup(uploaded_file):
     if uploaded_file is not None:
         # Reset the file pointer to the start of the file
         uploaded_file.seek(0)
@@ -123,8 +122,13 @@ def input_pdf_setup(uploaded_file):
 
 # Streamlit App
 
-st.set_page_config(page_title="ATS Resume Expert")
-st.header("ATS Tracking System")
+st.set_page_config(
+    page_title="ATS Resume Expert",
+    page_icon="🔥",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
+st.header("ATS Friendly Resume and Analysis")
 input_name = st.text_input("Enter your name: ", key="name", placeholder="John Doe")
 input_role = st.text_input(
     "Role you are applying for: ", key="role", placeholder="Software Engineer"
