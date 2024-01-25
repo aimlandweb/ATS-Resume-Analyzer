@@ -5,6 +5,7 @@ import base64
 import streamlit as st
 import os
 import io
+import textwrap
 from PIL import Image
 import pdf2image
 import google.generativeai as genai
@@ -29,11 +30,16 @@ def extract_field_from_description(description):
 def construct_prompt(template, field):
     return template.replace("[User-Specified Field]", field)
 
+def to_markdown(text):
+   text = text.replace('•', '  *')
+   return textwrap.indent(text, '> ', predicate=lambda _: True)
+
 
 def get_gemini_response(input, pdf_content, prompt):
     model = genai.GenerativeModel("gemini-pro-vision")
     response = model.generate_content([input, pdf_content[0], prompt])
-    return response.text
+    #   return response.text
+    return to_markdown(response.text)
 
 
 def input_pdf_setup(uploaded_file):
