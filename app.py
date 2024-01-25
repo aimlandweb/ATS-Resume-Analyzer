@@ -8,7 +8,7 @@ import io
 import textwrap
 import tempfile
 from PIL import Image
-import PyMuPDF as fitz
+import fitz
 import google.generativeai as genai
 from prompts import (
     input_prompt1,
