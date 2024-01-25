@@ -131,7 +131,6 @@ dynamic_prompt8 = construct_prompt(input_prompt8, field)
 if input_text and uploaded_file:
     try:
         pdf_content = input_pdf_setup(uploaded_file)
-        print(pdf_content)
         is_pdf_valid = True
 
     except Exception as e:
@@ -161,7 +160,6 @@ if input_text and uploaded_file:
         with tab1:
             st.header("HR/Human - Detailed Resume Analysis")
             if uploaded_file is not None:
-                # pdf_content = input_pdf_setup(uploaded_file)
                 response = get_gemini_response(dynamic_prompt1, pdf_content, input_text)
                 st.write(response)
             else:
@@ -170,7 +168,6 @@ if input_text and uploaded_file:
         with tab2:
             st.header("ATS/AI - Detailed Resume Analysis")
             if uploaded_file is not None:
-                # pdf_content = input_pdf_setup(uploaded_file)
                 response = get_gemini_response(dynamic_prompt2, pdf_content, input_text)
                 st.write(response)
             else:
@@ -179,7 +176,6 @@ if input_text and uploaded_file:
         with tab3:
             st.header("Skills Recommended for the Role")
             if uploaded_file is not None:
-                # pdf_content = input_pdf_setup(uploaded_file)
                 response = get_gemini_response(dynamic_prompt3, pdf_content, input_text)
                 st.write(response)
             else:
@@ -187,7 +183,6 @@ if input_text and uploaded_file:
         with tab4:
             st.header("ATS Friendly and optimized Resume")
             if uploaded_file is not None:
-                # pdf_content = input_pdf_setup(uploaded_file)
                 response = get_gemini_response(dynamic_prompt4, pdf_content, input_text)
                 st.write(response)
             else:
@@ -195,7 +190,6 @@ if input_text and uploaded_file:
         with tab5:
             st.header("Cover Letter for your resume")
             if uploaded_file is not None:
-                # pdf_content = input_pdf_setup(uploaded_file)
                 response = get_gemini_response(dynamic_prompt5, pdf_content, input_text)
                 st.write(response)
             else:
@@ -203,7 +197,6 @@ if input_text and uploaded_file:
         with tab6:
             st.header("LinkedIn Profile Recommendations")
             if uploaded_file is not None:
-                # pdf_content = input_pdf_setup(uploaded_file)
                 response = get_gemini_response(dynamic_prompt6, pdf_content, input_text)
                 st.write(response)
             else:
@@ -211,7 +204,6 @@ if input_text and uploaded_file:
         with tab7:
             st.header("Interview Questions and Questions to ask the interviewer")
             if uploaded_file is not None:
-                # pdf_content = input_pdf_setup(uploaded_file)
                 response = get_gemini_response(dynamic_prompt7, pdf_content, input_text)
                 st.write(response)
             else:
@@ -219,7 +211,6 @@ if input_text and uploaded_file:
         with tab8:
             st.header("Similar companies you can apply for")
             if uploaded_file is not None:
-                # pdf_content = input_pdf_setup(uploaded_file)
                 response = get_gemini_response(dynamic_prompt8, pdf_content, input_text)
                 st.write(response)
             else:
